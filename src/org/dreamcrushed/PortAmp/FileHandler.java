@@ -9,17 +9,20 @@ import java.io.IOException;
 public abstract class FileHandler {
 
 	public static FileHandler getHandler(File file) {
+		if (file.getName().endsWith("java")) {
+			return new JavaHandler();
+		}
 		return null;
 	}
 
-	final public Clazz parseFile(File file) {
-		Clazz clazz = new Clazz(baseName(file.getName()));
+	final public void parseFile(File file, DirManager dirManager) {
+		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
 			
 			while ((line = br.readLine()) != null) {
-				parseLine(line, clazz);
+				parseLine(line, dirManager);
 			}
 			br.close();
 		} catch (FileNotFoundException e) {
@@ -27,10 +30,9 @@ public abstract class FileHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return clazz;
 	}
 
-	protected void parseLine(String line, Clazz clazz) {
+	protected void parseLine(String line, DirManager dirManager) {
 		// Subclasses handle this
 	}
 

@@ -5,15 +5,21 @@ import java.util.List;
 
 public class Clazz {
 	private String fileName;
-	private String superClass;
+	private String[] superClass;
 	private List<Function>[] functions;
+	private List<Function>[] constructors;
 	private List<VarDefinition>[] vars;
 
 	@SuppressWarnings("unchecked")
 	Clazz(String fileName) {
 		this.fileName = fileName;
-		this.superClass = null;
+		this.superClass = new String[0];
 		this.functions = new List[] {
+				new ArrayList<Function>(),
+				new ArrayList<Function>(),
+				new ArrayList<Function>(),
+		};
+		this.constructors = new List[] {
 				new ArrayList<Function>(),
 				new ArrayList<Function>(),
 				new ArrayList<Function>(),
@@ -26,10 +32,15 @@ public class Clazz {
 	}
 
 	@SuppressWarnings("unchecked")
-	Clazz(String fileName, String superClass) {
+	Clazz(String fileName, String[] superClass) {
 		this.fileName = fileName;
 		this.superClass = superClass;
 		this.functions = new List[] {
+				new ArrayList<Function>(),
+				new ArrayList<Function>(),
+				new ArrayList<Function>(),
+		};
+		this.constructors = new List[] {
 				new ArrayList<Function>(),
 				new ArrayList<Function>(),
 				new ArrayList<Function>(),
@@ -50,6 +61,10 @@ public class Clazz {
 		}
 		return 2;
 	}
+
+	public void addConstructor(Function func, Privacy p) {
+		constructors[I(p)].add(func);
+	}
 	
 	public void addFunction(Function func, Privacy p) {
 		functions[I(p)].add(func);
@@ -61,6 +76,10 @@ public class Clazz {
 
 	public void writeOut(String string) {
 		
+	}
+
+	public String getName() {
+		return fileName;
 	}
 
 }

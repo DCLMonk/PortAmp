@@ -2,23 +2,25 @@ package org.dreamcrushed.PortAmp;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DirManager {
 
 	private File dir;
-	private List<Clazz> classes;
+	private Map<String, Clazz> classes;
 	private List<DirManager> subDirs;
 
 	public DirManager(String dir) {
 		this.dir = new File(dir);
-		classes = new ArrayList<Clazz>();
+		classes = new HashMap<String, Clazz>();
 		subDirs = new ArrayList<DirManager>();
 	}
 
 	public DirManager(File file) {
 		this.dir = file;
-		classes = new ArrayList<Clazz>();
+		classes = new HashMap<String, Clazz>();
 		subDirs = new ArrayList<DirManager>();
 	}
 
@@ -31,7 +33,7 @@ public class DirManager {
 			} else {
 				FileHandler handler = FileHandler.getHandler(file);
 				if (handler != null) {
-					classes.add(handler.parseFile(file));
+					handler.parseFile(file, this);
 				}
 			}
 		}
@@ -39,15 +41,15 @@ public class DirManager {
 
 	private void writeOut(String output) {
 		String myName = dir.getName();
-		File out = new File(output + File.pathSeparator + myName);
+		File out = new File(output + File.separator + myName);
 		if (!out.exists()) {
 			out.mkdir();
 		}
 		for (DirManager manager : subDirs) {
-			manager.writeOut(output + File.pathSeparator + myName);
+			manager.writeOut(output + File.separator + myName);
 		}
-		for (Clazz clazz : classes) {
-			clazz.writeOut(output + File.pathSeparator + myName);
+		for (Clazz clazz : classes.values()) {
+			clazz.writeOut(output + File.separator + myName);
 		}
 	}
 
@@ -60,15 +62,22 @@ public class DirManager {
 			System.out.print("Usage: " + args[0] + " [inputDir] outputDir");
 			return;
 		}
-		String output = args[1];
+		String output = "../output/";//args[1];
 		if (args.length > 2) {
 			dir = args[1];
 			output = args[2];
 		}
-		
+
 		DirManager manager = new DirManager(dir);
 		manager.parseDir();
 		manager.writeOut(output);
+	}
+
+	public Clazz getAddClass(String className, String[] superClasses) {
+		if (!classes.containsKey(className)) {
+			classes.put(className, new Clazz(className, superClasses));
+		}
+		return classes.get(className);
 	}
 
 }
