@@ -11,8 +11,17 @@ public class DirManager {
 	private File dir;
 	private Map<String, Clazz> classes;
 	private List<DirManager> subDirs;
+	private DirManager owner;
+
+	public DirManager(File file, DirManager owner) {
+		this.owner = owner;
+		this.dir = file;
+		classes = new HashMap<String, Clazz>();
+		subDirs = new ArrayList<DirManager>();
+	}
 
 	public DirManager(String dir) {
+		this.owner = null;
 		this.dir = new File(dir);
 		classes = new HashMap<String, Clazz>();
 		subDirs = new ArrayList<DirManager>();
@@ -27,7 +36,7 @@ public class DirManager {
 	private void parseDir() {
 		for (File file : dir.listFiles()) {
 			if (file.isDirectory()) {
-				DirManager manager = new DirManager(file);
+				DirManager manager = new DirManager(file, this);
 				manager.parseDir();
 				subDirs.add(manager);
 			} else {
@@ -70,6 +79,7 @@ public class DirManager {
 
 		DirManager manager = new DirManager(dir);
 		manager.parseDir();
+		manager.tagVirts();
 		manager.writeOut(output);
 	}
 
@@ -78,6 +88,47 @@ public class DirManager {
 			classes.put(className, new Clazz(className, superClasses));
 		}
 		return classes.get(className);
+	}
+
+	public Clazz getClass(String className) {
+		if (!classes.containsKey(className)) {
+			return null;
+		}
+		return classes.get(className);
+	}
+
+	public void tagVirts() {
+		for (Clazz clazz : classes.values()) {
+			clazz.tagVirts(this);
+		}
+		for (DirManager dir : subDirs) {
+			dir.tagVirts();
+		}
+	}
+	
+	public Clazz findClazz(String clazz) {
+		Clazz ret = getClass(clazz);
+		if (ret != null) return ret;
+		for (DirManager dm : subDirs) {
+			ret = dm.findClazz(clazz);
+			if (ret != null) return ret;
+		}
+		return null;
+	}
+	
+	public Clazz findClazzFull(String clazz) {
+		DirManager manager = this;
+		
+		while (manager != null) {
+			Clazz c = manager.findClazz(clazz);
+			if (c != null) return c;
+			manager = manager.getOwner();
+		}
+		return null;
+	}
+	
+	public DirManager getOwner() {
+		return owner;
 	}
 
 }

@@ -61,6 +61,19 @@ public class Clazz {
 		}
 		return 2;
 	}
+	
+	
+	public List<Function> getFunctions(String name) {
+		List<Function> ret = new ArrayList<Function>();
+		for (int i = 0; i < 3; i++) {
+			for (Function f : functions[i]) {
+				if (f.name.equals(name)) {
+					ret.add(f);
+				}
+			}
+		}
+		return ret;
+	}
 
 	public void addConstructor(Function func, Privacy p) {
 		constructors[I(p)].add(func);
@@ -80,6 +93,26 @@ public class Clazz {
 
 	public String getName() {
 		return fileName;
+	}
+	
+	public List<Function> getFunctions(int i) {
+		return functions[i];
+	}
+
+	public void tagVirts(DirManager dirManager) {
+		for (String superClazz : superClass) {
+			Clazz c = dirManager.findClazzFull(superClazz);
+			if (c != null) {
+				for (int i = 0; i < 3; i++) {
+					for (Function f : c.getFunctions(i)) {
+						if (functions[i].contains(f)) {
+							System.out.println("Tagging " + f.name + " as virtual");
+							f.setVirtual();
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

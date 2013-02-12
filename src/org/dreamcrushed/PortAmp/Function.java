@@ -53,4 +53,23 @@ public class Function {
 		return func;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Function) {
+			Function obj = (Function)o;
+			if (!name.equals(obj.name)) {
+				return false;
+			}
+			if (parameters.size() != obj.parameters.size()) return false;
+			if (!retType.equals(obj.retType)) return false;
+			for (int i = 0; i < parameters.size(); i++) {
+				if (!parameters.get(i).type.equals(obj.parameters.get(i).type)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
 }
